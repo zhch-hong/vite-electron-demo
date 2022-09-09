@@ -1,6 +1,7 @@
 import {app} from 'electron';
 import './security-restrictions';
 import {restoreOrCreateWindow} from '/@/mainWindow';
+import {installVueJSDevTools} from './devtools';
 
 /**
  * Prevent electron from running multiple instances.
@@ -36,7 +37,14 @@ app.on('activate', restoreOrCreateWindow);
  */
 app
   .whenReady()
-  .then(restoreOrCreateWindow)
+  .then(async () => {
+    try {
+      await installVueJSDevTools();
+      restoreOrCreateWindow();
+    } catch (error) {
+      //
+    }
+  })
   .catch(e => console.error('Failed create window:', e));
 
 /**
@@ -64,3 +72,4 @@ if (import.meta.env.PROD) {
     .then(({autoUpdater}) => autoUpdater.checkForUpdatesAndNotify())
     .catch(e => console.error('Failed check updates:', e));
 }
+
